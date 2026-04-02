@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinguaTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #1a1218;
+  --surf:    #221820;
+  --surf2:   #2c1f2a;
+  --bdr:     #3d2d3a;
+  --bdr2:    #5a4055;
+  --txt:     #f5eef2;
+  --muted:   #a08898;
+  --muted2:  #6b5565;
+  --en:      #e8a0b4;
+  --en-s:    rgba(232,160,180,.1);
+  --en-b:    rgba(232,160,180,.25);
+  --es:      #f0c080;
+  --es-s:    rgba(240,192,128,.1);
+  --es-b:    rgba(240,192,128,.25);
+  --green:   #90d4a8;
+  --green-s: rgba(144,212,168,.1);
+  --green-b: rgba(144,212,168,.3);
+  --red:     #e08888;
+  --red-s:   rgba(224,136,136,.1);
+  --acc:     #d4809a;
+  --acc2:    rgba(212,128,154,.12);
+  --acc-b:   rgba(212,128,154,.3);
+  --r:       14px;
+  --r2:      9px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.55;min-height:100%;display:flex}
+
+/* ── SIDEBAR ── */
+.sidebar{width:216px;min-height:100vh;background:rgba(34,24,32,.85);backdrop-filter:blur(20px);border-right:1px solid var(--bdr);display:flex;flex-direction:column;padding:28px 14px;position:fixed;top:0;left:0;bottom:0;z-index:40}
+.content{margin-left:216px;flex:1;padding:40px 40px 80px;max-width:960px}
+
+/* ── LOGO ── */
+.logo{display:flex;align-items:center;gap:10px;padding:0 6px;margin-bottom:36px}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--acc),#b06080);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.logo-text{font-family:'Lora',serif;font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px;line-height:1.1}
+.logo-sub{font-size:10px;color:var(--muted);margin-top:1px;font-weight:300}
+
+/* ── NAV ── */
+.nav-lbl{font-size:9px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:2px;padding:0 8px;margin-bottom:4px;margin-top:16px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r2);color:var(--muted);font-size:13px;cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:1px;user-select:none}
+.nav-item:hover{background:var(--surf2);color:var(--txt)}
+.nav-item.active{background:var(--acc2);border-color:var(--acc-b);color:var(--acc);font-weight:500}
+.nav-ic{font-size:15px;width:18px;text-align:center;flex-shrink:0;opacity:.7}
+.nav-div{border:none;border-top:1px solid var(--bdr);margin:12px 0}
+
+/* ── SIDEBAR FOOTER ── */
+.sb-foot{margin-top:auto;padding:0 4px}
+.lang-pills{display:flex;gap:6px}
+.lp{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:var(--r2);padding:9px 10px;text-align:center;backdrop-filter:blur(8px)}
+.lp-flag{font-size:17px}.lp-name{font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+.lp-pct{font-size:13px;font-weight:600;margin-top:2px}
+.lp.en .lp-pct{color:var(--en)}.lp.es .lp-pct{color:var(--es)}
+
+/* ── PANELS ── */
+.panel{display:none;flex-direction:column;gap:22px}
+.panel.active{display:flex;animation:up .3s ease both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ── PAGE HEADER ── */
+.ph{margin-bottom:4px}
+.ph h1{font-family:'Lora',serif;font-size:27px;font-weight:600;color:#fff;letter-spacing:-.4px;line-height:1.2}
+.ph h1 em{font-style:italic;color:var(--acc)}
+.ph p{font-size:13px;color:var(--muted);margin-top:5px;font-weight:300}
+
+/* ── CARD ── */
+.card{background:rgba(44,31,42,.7);border:1px solid var(--bdr);border-radius:var(--r);padding:22px 24px;backdrop-filter:blur(12px);transition:border-color .2s}
+.card:hover{border-color:var(--bdr2)}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.8px}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* ── STATS ── */
+.stat{background:rgba(44,31,42,.7);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px;backdrop-filter:blur(12px);position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.c-en::before{background:linear-gradient(90deg,var(--en),transparent)}
+.c-es::before{background:linear-gradient(90deg,var(--es),transparent)}
+.c-green::before{background:linear-gradient(90deg,var(--green),transparent)}
+.c-acc::before{background:linear-gradient(90deg,var(--acc),transparent)}
+.stat-v{font-family:'Lora',serif;font-size:28px;font-weight:600;line-height:1;margin-bottom:5px}
+.stat-l{font-size:11px;color:var(--muted);line-height:1.3}
+.c-en .stat-v{color:var(--en)}.c-es .stat-v{color:var(--es)}.c-green .stat-v{color:var(--green)}.c-acc .stat-v{color:var(--acc)}
+
+/* ── TODAY ── */
+.today-card{background:rgba(44,31,42,.7);border:1px solid var(--bdr);border-radius:var(--r);padding:22px 24px;backdrop-filter:blur(12px)}
+.today-day{font-family:'Lora',serif;font-size:20px;font-weight:600;color:#fff;margin-bottom:14px}
+.task-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr)}
+.task-item:last-child{border-bottom:none;padding-bottom:0}
+.task-period{font-size:9px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;padding:3px 8px;border-radius:5px;flex-shrink:0;width:52px;text-align:center}
+.task-period.en{background:var(--en-s);color:var(--en);border:1px solid var(--en-b)}
+.task-period.es{background:var(--es-s);color:var(--es);border:1px solid var(--es-b)}
+.task-text{flex:1;font-size:13px}
+.task-btn{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;border:1px solid var(--bdr2);background:transparent;color:var(--muted);flex-shrink:0}
+.task-btn:hover{border-color:var(--green);color:var(--green)}
+.task-btn.done{background:var(--green-s);border-color:var(--green-b);color:var(--green)}
+
+/* ── PROGRESS ── */
+.prog-item{margin-bottom:18px}.prog-item:last-child{margin-bottom:0}
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-name{font-size:13px;font-weight:500}
+.prog-pct{font-family:'Lora',serif;font-size:15px;font-weight:600}
+.prog-track{background:rgba(255,255,255,.06);border-radius:99px;height:6px;overflow:hidden;margin-bottom:8px}
+.prog-fill{height:100%;border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.prog-fill.en{background:linear-gradient(90deg,#c070a0,var(--en))}
+.prog-fill.es{background:linear-gradient(90deg,#d4a060,var(--es))}
+input[type=range]{width:100%;height:4px;cursor:pointer;border-radius:99px;outline:none;border:none;-webkit-appearance:none;background:rgba(255,255,255,.08)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--bg);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
+input[type=range].en::-webkit-slider-thumb{background:var(--en)}
+input[type=range].es::-webkit-slider-thumb{background:var(--es)}
+
+/* ── SKILLS ── */
+.skill-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr)}
+.skill-item:last-child{border-bottom:none}
+.skill-flag{font-size:18px;flex-shrink:0}
+.skill-info{flex:1;min-width:0}
+.skill-name{font-size:13px;font-weight:500;margin-bottom:6px}
+.skill-bar-wrap{background:rgba(255,255,255,.06);border-radius:99px;height:5px;overflow:hidden}
+.skill-bar{height:100%;border-radius:99px;transition:width .4s}
+.skill-bar.en{background:linear-gradient(90deg,#c070a0,var(--en))}
+.skill-bar.es{background:linear-gradient(90deg,#d4a060,var(--es))}
+.skill-bar.green{background:linear-gradient(90deg,#60b888,var(--green))}
+.skill-bar.acc{background:linear-gradient(90deg,#b06080,var(--acc))}
+.skill-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.skill-pct{font-size:12px;font-weight:600;color:var(--muted);min-width:34px;text-align:right}
+.icon-btn{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid var(--bdr);color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-btn:hover{color:var(--txt);border-color:var(--bdr2)}
+.icon-btn.del:hover{border-color:var(--red);color:var(--red);background:var(--red-s)}
+
+/* ── AGENDA ── */
+.agenda-day{background:rgba(44,31,42,.7);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;backdrop-filter:blur(12px)}
+.agenda-day-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--bdr);background:rgba(255,255,255,.03)}
+.agenda-day-name{font-weight:600;font-size:13px}
+.agenda-day-tag{font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.agenda-day-tag.en{background:var(--en-s);color:var(--en);border:1px solid var(--en-b)}
+.agenda-day-tag.es{background:var(--es-s);color:var(--es);border:1px solid var(--es-b)}
+.agenda-day-tag.rest{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--bdr)}
+.agenda-tasks{padding:8px 18px}
+.agenda-task-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bdr)}
+.agenda-task-row:last-child{border-bottom:none}
+.atag{font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:4px;flex-shrink:0;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--bdr)}
+.atext{flex:1;font-size:12.5px}
+.aedit{padding:3px 10px;font-size:11px;border-radius:20px;background:transparent;border:1px solid var(--bdr2);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;flex-shrink:0}
+.aedit:hover{border-color:var(--acc);color:var(--acc)}
+.add-task-btn{display:flex;align-items:center;gap:6px;padding:9px 18px;color:var(--muted);font-size:12px;cursor:pointer;transition:color .15s;border-top:1px solid var(--bdr);background:transparent;border-left:none;border-right:none;border-bottom:none;width:100%;font-family:'DM Sans',sans-serif}
+.add-task-btn:hover{color:var(--acc)}
+
+/* ── SESSIONS ── */
+.sess-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr)}
+.sess-row:last-child{border-bottom:none}
+.sess-flag{font-size:19px;flex-shrink:0}
+.sess-info{flex:1;min-width:0}
+.sess-type{font-size:13px;font-weight:500}
+.sess-note{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sess-r{text-align:right;flex-shrink:0}
+.sess-dur{font-family:'Lora',serif;font-size:15px;font-weight:600}
+.sess-dur.en{color:var(--en)}.sess-dur.es{color:var(--es)}
+.sess-date{font-size:10px;color:var(--muted2);margin-top:2px}
+.sess-del{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:5px;transition:all .15s}
+.sess-del:hover{color:var(--red);background:var(--red-s)}
+
+/* ── CHECKPOINTS ── */
+.cp-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--bdr)}
+.cp-item:last-child{border-bottom:none}
+.cp-cb{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bdr2);background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--bg);font-weight:700;transition:all .15s}
+.cp-cb:hover{border-color:var(--green)}
+.cp-cb.done{background:var(--green);border-color:var(--green)}
+.cp-month{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--acc);margin-bottom:2px;font-weight:600}
+.cp-label{font-size:13px;font-weight:500;margin-bottom:2px}
+.cp-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ── STEPPER ── */
+.stepper{display:flex;align-items:center;gap:16px}
+.step-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bdr2);color:var(--txt);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.step-btn:hover{border-color:var(--acc);color:var(--acc);background:var(--acc2)}
+.step-c{text-align:center;flex:1}
+.step-num{font-family:'Lora',serif;font-size:44px;font-weight:600;color:var(--acc);line-height:1}
+.step-of{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── NOTES ── */
+.note-item{background:rgba(44,31,42,.7);border:1px solid var(--bdr);border-radius:var(--r);padding:16px 18px;backdrop-filter:blur(12px)}
+.note-text{font-size:13px;line-height:1.7;font-weight:300;white-space:pre-wrap}
+.note-meta{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.note-date{font-size:10px;color:var(--muted2)}
+.note-del{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px;padding:3px 5px;border-radius:5px;transition:all .15s;font-family:'DM Sans',sans-serif}
+.note-del:hover{color:var(--red)}
+
+/* ── MATERIALS ── */
+.mat-card{background:rgba(44,31,42,.7);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;text-decoration:none;color:inherit;display:block;transition:all .18s;backdrop-filter:blur(12px)}
+.mat-card:hover{border-color:var(--bdr2);transform:translateY(-2px)}
+.mat-icon{font-size:22px;margin-bottom:8px}
+.mat-name{font-size:13px;font-weight:600;margin-bottom:3px}
+.mat-desc{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ── FORMS ── */
+.fr{margin-bottom:14px}.fr:last-child{margin-bottom:0}
+.fl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.4px;display:block;margin-bottom:6px}
+.fi,.fs,.fta{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bdr2);color:var(--txt);border-radius:var(--r2);padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .15s;outline:none}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--acc)}
+.fs option{background:#2c1f2a}
+.fta{resize:vertical;min-height:80px;line-height:1.6}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 20px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;border:none}
+.btn-p{background:linear-gradient(135deg,var(--acc),#b06080);color:#fff}
+.btn-p:hover{opacity:.88;transform:translateY(-1px)}
+.btn-g{background:rgba(255,255,255,.05);border:1px solid var(--bdr2);color:var(--muted)}
+.btn-g:hover{border-color:var(--txt);color:var(--txt)}
+.btn-sm{padding:6px 14px;font-size:11.5px}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(10,6,12,.7);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:#2c1f2a;border:1px solid var(--bdr2);border-radius:18px;padding:28px;width:100%;max-width:440px;animation:up .22s ease both}
+.modal h2{font-family:'Lora',serif;font-size:19px;font-weight:600;margin-bottom:20px;color:#fff}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:32px 16px}
+.empty-icon{font-size:30px;margin-bottom:10px;opacity:.3}
+.empty-msg{font-size:13px;color:var(--muted);font-style:italic}
+
+hr.dv{border:none;border-top:1px solid var(--bdr);margin:18px 0}
+
+/* ── MOBILE NAV ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(34,24,32,.95);backdrop-filter:blur(16px);border-top:1px solid var(--bdr);padding:6px 0 10px;z-index:100;justify-content:space-around}
+.mob-item{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:8px;font-size:10px;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s}
+.mob-item.active{color:var(--acc)}
+.mob-ic{font-size:19px}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+
+@media(max-width:780px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s;width:200px}
+  .sidebar.open{transform:none}
+  .content{margin-left:0;padding:24px 16px 72px}
+  .g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.fg2{grid-template-columns:1fr}
+  .mob-nav{display:flex}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">🌍</div>
+    <div><div class="logo-text">LinguaTrack</div><div class="logo-sub">Vitória · 2025</div></div>
+  </div>
+
+  <div class="nav-lbl">Visão Geral</div>
+  <div class="nav-item active" data-panel="dashboard" onclick="nav(this)"><span class="nav-ic">▦</span>Dashboard</div>
+  <div class="nav-lbl">Estudo</div>
+  <div class="nav-item" data-panel="agenda" onclick="nav(this)"><span class="nav-ic">◷</span>Agenda</div>
+  <div class="nav-item" data-panel="progresso" onclick="nav(this)"><span class="nav-ic">◉</span>Progresso</div>
+  <div class="nav-item" data-panel="sessoes" onclick="nav(this)"><span class="nav-ic">▷</span>Sessões</div>
+  <hr class="nav-div">
+  <div class="nav-lbl">Recursos</div>
+  <div class="nav-item" data-panel="materiais" onclick="nav(this)"><span class="nav-ic">◫</span>Materiais</div>
+  <div class="nav-item" data-panel="notas" onclick="nav(this)"><span class="nav-ic">◌</span>Notas</div>
+
+  <div class="sb-foot">
+    <div class="lang-pills">
+      <div class="lp en"><div class="lp-flag">🇺🇸</div><div class="lp-name">Inglês</div><div class="lp-pct" id="sb-en">0%</div></div>
+      <div class="lp es"><div class="lp-flag">🇪🇸</div><div class="lp-name">Espanhol</div><div class="lp-pct" id="sb-es">0%</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="content">
+
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="ph"><h1>Olá, <em>Vitória</em> 👋</h1><p id="dash-sub">Carregando...</p></div>
+    <div class="g4">
+      <div class="stat c-en"><div class="stat-v" id="d-en">0m</div><div class="stat-l">Total Inglês</div></div>
+      <div class="stat c-es"><div class="stat-v" id="d-es">0m</div><div class="stat-l">Total Espanhol</div></div>
+      <div class="stat c-green"><div class="stat-v" id="d-week">0</div><div class="stat-l">Sessões esta semana</div></div>
+      <div class="stat c-acc"><div class="stat-v" id="d-month">M1</div><div class="stat-l">Mês do plano</div></div>
+    </div>
+    <div class="g2">
+      <div class="today-card"><div class="today-day" id="today-day">—</div><div id="today-tasks"></div></div>
+      <div class="card">
+        <div class="card-h">
+          <span class="card-title">Progresso Geral</span>
+          <span style="font-size:11px;color:var(--acc);cursor:pointer;font-weight:500" onclick="nav(document.querySelector('[data-panel=progresso]'))">Ver tudo →</span>
+        </div>
+        <div class="prog-item">
+          <div class="prog-row"><span class="prog-name">🇺🇸 Inglês</span><span class="prog-pct" id="en-lbl" style="color:var(--en)">0%</span></div>
+          <div class="prog-track"><div class="prog-fill en" id="en-fill" style="width:0%"></div></div>
+          <input type="range" class="en" min="0" max="100" value="0" id="en-sl" oninput="setLang('en',this.value)">
+        </div>
+        <div class="prog-item" style="margin-bottom:0">
+          <div class="prog-row"><span class="prog-name">🇪🇸 Espanhol</span><span class="prog-pct" id="es-lbl" style="color:var(--es)">0%</span></div>
+          <div class="prog-track"><div class="prog-fill es" id="es-fill" style="width:0%"></div></div>
+          <input type="range" class="es" min="0" max="100" value="0" id="es-sl" oninput="setLang('es',this.value)">
+        </div>
+        <hr class="dv">
+        <div class="card-title" style="margin-bottom:12px">Mês do Plano</div>
+        <div class="stepper">
+          <button class="step-btn" onclick="changeMonth(-1)">−</button>
+          <div class="step-c"><div class="step-num" id="mn1">1</div><div class="step-of">de 12 meses</div></div>
+          <button class="step-btn" onclick="changeMonth(+1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="panel" id="panel-agenda">
+    <div class="ph"><h1>Agenda <em>Semanal</em></h1><p>Personalize sua rotina — edite e adicione atividades por dia</p></div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="agenda-list"></div>
+  </div>
+
+  <!-- PROGRESSO -->
+  <div class="panel" id="panel-progresso">
+    <div class="ph"><h1>Seu <em>Progresso</em></h1><p>Habilidades personalizáveis, checkpoints e mês do plano</p></div>
+    <div class="card">
+      <div class="card-h"><span class="card-title">Habilidades</span><button class="btn btn-p btn-sm" onclick="openModal('skill')" style="width:auto">+ Adicionar</button></div>
+      <div id="skills-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><span class="card-title">Checkpoints</span><button class="btn btn-g btn-sm" onclick="openModal('cp')" style="width:auto">+ Adicionar</button></div>
+      <div id="checkpoints-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Mês do Plano</div>
+      <div class="stepper">
+        <button class="step-btn" onclick="changeMonth(-1)">−</button>
+        <div class="step-c"><div class="step-num" id="mn2">1</div><div class="step-of">de 12 meses</div></div>
+        <button class="step-btn" onclick="changeMonth(+1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSÕES -->
+  <div class="panel" id="panel-sessoes">
+    <div class="ph"><h1>Registro de <em>Sessões</em></h1><p>Registre cada sessão para acompanhar seu ritmo</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-p btn-sm" onclick="openModal('sess')" style="width:auto">+ Nova sessão</button>
+      <div class="stat c-en" style="flex:1;min-width:120px;padding:14px 16px"><div class="stat-v" id="s-en" style="font-size:22px">0m</div><div class="stat-l">Inglês</div></div>
+      <div class="stat c-es" style="flex:1;min-width:120px;padding:14px 16px"><div class="stat-v" id="s-es" style="font-size:22px">0m</div><div class="stat-l">Espanhol</div></div>
+    </div>
+    <div class="card"><div class="card-title">Histórico</div><div id="sess-list"></div></div>
+  </div>
+
+  <!-- MATERIAIS -->
+  <div class="panel" id="panel-materiais">
+    <div class="ph"><h1>Materiais <em>Recomendados</em></h1><p>Recursos selecionados para o seu perfil</p></div>
+    <div class="card"><div class="card-title" style="color:var(--en);margin-bottom:14px">🇺🇸 Inglês</div><div class="g3" id="mat-en"></div></div>
+    <div class="card"><div class="card-title" style="color:var(--es);margin-bottom:14px">🇪🇸 Espanhol</div><div class="g3" id="mat-es"></div></div>
+  </div>
+
+  <!-- NOTAS -->
+  <div class="panel" id="panel-notas">
+    <div class="ph"><h1>Notas & <em>Reflexões</em></h1><p>Anote aprendizados, palavras novas e insights</p></div>
+    <div class="card">
+      <div class="fr"><label class="fl">Nova nota <span style="color:var(--muted2);font-size:9px;text-transform:none;letter-spacing:0">(Ctrl+Enter para salvar)</span></label>
+      <textarea class="fta" id="note-input" placeholder="Palavra nova, dificuldade do dia, progresso percebido..."></textarea></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-p btn-sm" style="width:auto" onclick="addNote()">Salvar</button></div>
+    </div>
+    <div id="notes-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+</main>
+
+<nav class="mob-nav">
+  <button class="mob-item active" data-panel="dashboard" onclick="navM(this)"><span class="mob-ic">▦</span>Home</button>
+  <button class="mob-item" data-panel="agenda" onclick="navM(this)"><span class="mob-ic">◷</span>Agenda</button>
+  <button class="mob-item" data-panel="progresso" onclick="navM(this)"><span class="mob-ic">◉</span>Progresso</button>
+  <button class="mob-item" data-panel="sessoes" onclick="navM(this)"><span class="mob-ic">▷</span>Sessões</button>
+  <button class="mob-item" data-panel="notas" onclick="navM(this)"><span class="mob-ic">◌</span>Notas</button>
+</nav>
+
+<!-- MODALS -->
+<div class="overlay" id="modal-sess" onclick="if(event.target===this)closeModal('sess')">
+  <div class="modal"><h2>Nova Sessão</h2>
+    <div class="fg2">
+      <div class="fr"><label class="fl">Idioma</label><select class="fs" id="m-lang"><option value="en">🇺🇸 Inglês</option><option value="es">🇪🇸 Espanhol</option></select></div>
+      <div class="fr"><label class="fl">Duração (min)</label><input type="number" class="fi" id="m-dur" value="30" min="1"></div>
+      <div class="fr"><label class="fl">Tipo</label>
+        <select class="fs" id="m-type"><option>🎧 Escuta</option><option>🗣️ Conversação</option><option>📚 Vocabulário</option><option>📖 Leitura</option><option>📺 Série / Filme</option><option>👨‍🏫 Aula particular</option><option>🎙️ Podcast</option></select>
+      </div>
+      <div class="fr"><label class="fl">Data</label><input type="date" class="fi" id="m-date"></div>
+    </div>
+    <div class="fr"><label class="fl">Nota rápida</label><input type="text" class="fi" id="m-note" placeholder="opcional..."></div>
+    <div class="modal-foot"><button class="btn btn-g btn-sm" onclick="closeModal('sess')">Cancelar</button><button class="btn btn-p btn-sm" onclick="saveSess()">Salvar</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-skill" onclick="if(event.target===this)closeModal('skill')">
+  <div class="modal"><h2 id="sk-title">Nova Habilidade</h2>
+    <div class="fr"><label class="fl">Nome</label><input type="text" class="fi" id="sk-name" placeholder="Ex: Vocabulário, Conversação..."></div>
+    <div class="fg2">
+      <div class="fr"><label class="fl">Idioma</label><select class="fs" id="sk-lang"><option value="en">🇺🇸 Inglês</option><option value="es">🇪🇸 Espanhol</option></select></div>
+      <div class="fr"><label class="fl">Progresso (%)</label><input type="number" class="fi" id="sk-pct" value="0" min="0" max="100"></div>
+    </div>
+    <div class="fr"><label class="fl">Cor</label>
+      <select class="fs" id="sk-color"><option value="en">Rosé</option><option value="es">Âmbar</option><option value="green">Verde</option><option value="acc">Pink</option></select>
+    </div>
+    <div class="modal-foot"><button class="btn btn-g btn-sm" onclick="closeModal('skill')">Cancelar</button><button class="btn btn-p btn-sm" onclick="saveSkill()">Salvar</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-cp" onclick="if(event.target===this)closeModal('cp')">
+  <div class="modal"><h2>Novo Checkpoint</h2>
+    <div class="fg2">
+      <div class="fr"><label class="fl">Mês</label><input type="number" class="fi" id="cp-month" value="3" min="1" max="12"></div>
+      <div class="fr"><label class="fl">Título</label><input type="text" class="fi" id="cp-label" placeholder="Ex: Checkpoint Fase 1"></div>
+    </div>
+    <div class="fr"><label class="fl">Descrição</label><textarea class="fta" id="cp-desc" style="min-height:64px" placeholder="O que você quer conseguir nesse mês?"></textarea></div>
+    <div class="modal-foot"><button class="btn btn-g btn-sm" onclick="closeModal('cp')">Cancelar</button><button class="btn btn-p btn-sm" onclick="saveCp()">Salvar</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="modal-task" onclick="if(event.target===this)closeModal('task')">
+  <div class="modal"><h2 id="task-title">Nova Atividade</h2>
+    <input type="hidden" id="t-di"><input type="hidden" id="t-ti">
+    <div class="fg2">
+      <div class="fr"><label class="fl">Período</label><select class="fs" id="t-period"><option>Manhã</option><option>Tarde</option><option>Noite</option></select></div>
+      <div class="fr"><label class="fl">Idioma</label><select class="fs" id="t-lang"><option value="en">🇺🇸 Inglês</option><option value="es">🇪🇸 Espanhol</option></select></div>
+    </div>
+    <div class="fr"><label class="fl">Descrição</label><input type="text" class="fi" id="t-text" placeholder="Ex: 🎧 BBC Learning English"></div>
+    <div class="modal-foot"><button class="btn btn-g btn-sm" onclick="closeModal('task')">Cancelar</button><button class="btn btn-p btn-sm" onclick="saveTask()">Salvar</button></div>
+  </div>
+</div>
+
+<script>
+const KEY='lt_v5';
+const DEF={
+  month:1,enProg:0,esProg:0,sessions:[],notes:[],completedDays:{},
+  skills:[
+    {id:1,name:'Vocabulário',lang:'en',pct:0,color:'en'},{id:2,name:'Escuta',lang:'en',pct:0,color:'en'},
+    {id:3,name:'Conversação',lang:'en',pct:0,color:'en'},{id:4,name:'Vocabulário',lang:'es',pct:0,color:'es'},
+    {id:5,name:'Conversação',lang:'es',pct:0,color:'es'}
+  ],
+  checkpoints:[],
+  agenda:[
+    {day:'Segunda',tasks:[{period:'Manhã',text:'🎧 Inglês — escuta (BBC / podcast)',lang:'en'},{period:'Noite',text:'🗣️ Inglês — iTalki ou estudo livre',lang:'en'}]},
+    {day:'Terça',  tasks:[{period:'Manhã',text:'🎧 Inglês — escuta',lang:'en'},{period:'Noite',text:'📚 Inglês — vocabulário no Anki',lang:'en'}]},
+    {day:'Quarta', tasks:[{period:'Manhã',text:'📖 Espanhol — revisão da aula',lang:'es'},{period:'Noite',text:'✍️ Espanhol — estudo livre',lang:'es'}]},
+    {day:'Quinta', tasks:[{period:'Manhã',text:'🎧 Inglês — escuta',lang:'en'},{period:'Noite',text:'🗣️ Inglês — iTalki ou estudo livre',lang:'en'}]},
+    {day:'Sexta',  tasks:[{period:'Manhã',text:'🎵 Espanhol — escuta / música',lang:'es'},{period:'Noite',text:'✍️ Espanhol — estudo livre',lang:'es'}]},
+    {day:'Sábado', tasks:[{period:'Noite',text:'🗣️ 2h Inglês — aula iTalki + prática intensiva',lang:'en'}]},
+    {day:'Domingo',tasks:[{period:'Noite',text:'📖 2h Espanhol — revisão semanal + Duolingo',lang:'es'}]}
+  ]
+};
+let D=(()=>{try{const s=localStorage.getItem(KEY);if(!s)return{...DEF};const p=JSON.parse(s);return{...DEF,...p,skills:p.skills||DEF.skills,checkpoints:p.checkpoints||[],agenda:p.agenda||DEF.agenda};}catch{return{...DEF};}})();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(D));}catch{}};
+const today=()=>new Date().toISOString().split('T')[0];
+const fmtMin=m=>m>=60?`${Math.floor(m/60)}h${m%60>0?' '+m%60+'m':''}`:m+'m';
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function nav(el){
+  const id=el.dataset.panel;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+}
+function navM(el){
+  const id=el.dataset.panel;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.mob-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{n.dataset.panel===id?n.classList.add('active'):n.classList.remove('active');});
+}
+
+let editSkId=null;
+function openModal(type,extra){
+  if(type==='sess'){document.getElementById('m-date').value=today();document.getElementById('modal-sess').classList.add('open');}
+  if(type==='skill'){
+    editSkId=extra?.id??null;
+    document.getElementById('sk-title').textContent=editSkId?'Editar Habilidade':'Nova Habilidade';
+    if(editSkId){const sk=D.skills.find(s=>s.id===editSkId);document.getElementById('sk-name').value=sk.name;document.getElementById('sk-lang').value=sk.lang;document.getElementById('sk-pct').value=sk.pct;document.getElementById('sk-color').value=sk.color;}
+    else{document.getElementById('sk-name').value='';document.getElementById('sk-pct').value=0;}
+    document.getElementById('modal-skill').classList.add('open');
+  }
+  if(type==='cp'){document.getElementById('modal-cp').classList.add('open');}
+  if(type==='task'){
+    const{di,ti}=extra||{};
+    document.getElementById('t-di').value=di??'';document.getElementById('t-ti').value=ti??'';
+    if(ti!==undefined){const t=D.agenda[di].tasks[ti];document.getElementById('task-title').textContent='Editar Atividade';document.getElementById('t-period').value=t.period;document.getElementById('t-lang').value=t.lang;document.getElementById('t-text').value=t.text;}
+    else{document.getElementById('task-title').textContent='Nova Atividade';document.getElementById('t-text').value='';}
+    document.getElementById('modal-task').classList.add('open');
+  }
+}
+function closeModal(t){document.getElementById('modal-'+t).classList.remove('open');}
+
+function saveSess(){
+  const lang=document.getElementById('m-lang').value,dur=parseInt(document.getElementById('m-dur').value)||30,
+  type=document.getElementById('m-type').value,note=document.getElementById('m-note').value.trim(),
+  date=document.getElementById('m-date').value||today();
+  D.sessions.push({id:Date.now(),lang,dur,type,note,date});
+  save();renderSessions();updateStats();closeModal('sess');document.getElementById('m-note').value='';
+}
+function saveSkill(){
+  const name=document.getElementById('sk-name').value.trim(),lang=document.getElementById('sk-lang').value,
+  pct=Math.min(100,Math.max(0,parseInt(document.getElementById('sk-pct').value)||0)),color=document.getElementById('sk-color').value;
+  if(!name)return;
+  if(editSkId){const sk=D.skills.find(s=>s.id===editSkId);Object.assign(sk,{name,lang,pct,color});}
+  else D.skills.push({id:Date.now(),name,lang,pct,color});
+  save();renderSkills();updateSidebar();closeModal('skill');
+}
+function saveCp(){
+  const month=parseInt(document.getElementById('cp-month').value)||1,
+  label=document.getElementById('cp-label').value.trim(),desc=document.getElementById('cp-desc').value.trim();
+  if(!label)return;
+  D.checkpoints.push({id:Date.now(),month,label,desc,done:false});
+  D.checkpoints.sort((a,b)=>a.month-b.month);
+  save();renderCheckpoints();closeModal('cp');
+  document.getElementById('cp-label').value='';document.getElementById('cp-desc').value='';
+}
+function saveTask(){
+  const di=parseInt(document.getElementById('t-di').value),tiRaw=document.getElementById('t-ti').value,
+  period=document.getElementById('t-period').value,lang=document.getElementById('t-lang').value,
+  text=document.getElementById('t-text').value.trim();
+  if(!text||isNaN(di))return;
+  if(tiRaw!=='')D.agenda[di].tasks[parseInt(tiRaw)]={period,lang,text};
+  else D.agenda[di].tasks.push({period,lang,text});
+  save();renderAgenda();renderToday();closeModal('task');
+}
+
+function renderToday(){
+  const dow=new Date().getDay(),map=[6,0,1,2,3,4,5],sched=D.agenda[map[dow]],d=today();
+  const days=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  document.getElementById('today-day').textContent=days[new Date().getDay()];
+  if(!sched||!sched.tasks.length){document.getElementById('today-tasks').innerHTML='<div style="font-size:13px;color:var(--muted);font-style:italic;padding:4px 0">Nenhuma atividade para hoje.</div>';return;}
+  document.getElementById('today-tasks').innerHTML=sched.tasks.map((t,i)=>{
+    const key=`${d}_${map[dow]}_${i}`,done=D.completedDays[key];
+    return`<div class="task-item"><span class="task-period ${t.lang}">${t.period}</span><span class="task-text">${esc(t.text)}</span><button class="task-btn${done?' done':''}" onclick="toggleDay('${key}')">${done?'✓ Feito':'Marcar'}</button></div>`;
+  }).join('');
+}
+function toggleDay(key){D.completedDays[key]=!D.completedDays[key];save();renderToday();updateStats();}
+
+function renderAgenda(){
+  document.getElementById('agenda-list').innerHTML=D.agenda.map((day,di)=>{
+    const enC=day.tasks.filter(t=>t.lang==='en').length,esC=day.tasks.filter(t=>t.lang==='es').length;
+    const ml=!day.tasks.length?'rest':enC>=esC?'en':'es';
+    const tl=ml==='en'?'🇺🇸 Inglês':ml==='es'?'🇪🇸 Espanhol':'Descanso';
+    const tasks=day.tasks.map((t,ti)=>`<div class="agenda-task-row"><span class="atag">${t.period}</span><span class="atext">${esc(t.text)}</span><button class="aedit" onclick="openModal('task',{di:${di},ti:${ti}})">Editar</button><button class="icon-btn del" onclick="delTask(${di},${ti})">×</button></div>`).join('');
+    return`<div class="agenda-day"><div class="agenda-day-hdr"><span class="agenda-day-name">${day.day}</span><span class="agenda-day-tag ${ml}">${tl}</span></div><div class="agenda-tasks">${tasks||'<div style="font-size:12px;color:var(--muted);padding:4px 0">Nenhuma atividade</div>'}</div><button class="add-task-btn" onclick="openModal('task',{di:${di}})">+ Adicionar atividade</button></div>`;
+  }).join('');
+}
+function delTask(di,ti){D.agenda[di].tasks.splice(ti,1);save();renderAgenda();renderToday();}
+
+function renderSkills(){
+  const el=document.getElementById('skills-list');
+  if(!D.skills.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-msg">Nenhuma habilidade. Adicione uma!</div></div>';return;}
+  el.innerHTML=D.skills.map(sk=>`<div class="skill-item"><div class="skill-flag">${sk.lang==='en'?'🇺🇸':'🇪🇸'}</div><div class="skill-info"><div class="skill-name">${esc(sk.name)}</div><div class="skill-bar-wrap"><div class="skill-bar ${sk.color}" style="width:${sk.pct}%"></div></div></div><div class="skill-actions"><span class="skill-pct">${sk.pct}%</span><button class="icon-btn" onclick="openModal('skill',{id:${sk.id}})" title="Editar">✎</button><button class="icon-btn del" onclick="delSkill(${sk.id})">×</button></div></div>`).join('');
+}
+function delSkill(id){D.skills=D.skills.filter(s=>s.id!==id);save();renderSkills();updateSidebar();}
+
+function renderCheckpoints(){
+  const el=document.getElementById('checkpoints-list');
+  if(!D.checkpoints.length){el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div><div class="empty-msg">Nenhum checkpoint. Adicione marcos de aprendizado!</div></div>';return;}
+  el.innerHTML=D.checkpoints.map(cp=>`<div class="cp-item" style="opacity:${cp.done?1:.75}"><button class="cp-cb${cp.done?' done':''}" onclick="toggleCp(${cp.id})">${cp.done?'✓':''}</button><div style="flex:1"><div class="cp-month">Mês ${cp.month}</div><div class="cp-label">${esc(cp.label)}</div>${cp.desc?`<div class="cp-desc">${esc(cp.desc)}</div>`:''}</div><button class="icon-btn del" onclick="delCp(${cp.id})">×</button></div>`).join('');
+}
+function toggleCp(id){const c=D.checkpoints.find(x=>x.id===id);if(c)c.done=!c.done;save();renderCheckpoints();}
+function delCp(id){D.checkpoints=D.checkpoints.filter(c=>c.id!==id);save();renderCheckpoints();}
+
+function renderSessions(){
+  const enMin=D.sessions.filter(s=>s.lang==='en').reduce((a,s)=>a+s.dur,0);
+  const esMin=D.sessions.filter(s=>s.lang==='es').reduce((a,s)=>a+s.dur,0);
+  document.getElementById('s-en').textContent=fmtMin(enMin);
+  document.getElementById('s-es').textContent=fmtMin(esMin);
+  const el=document.getElementById('sess-list');
+  if(!D.sessions.length){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-msg">Nenhuma sessão ainda. Registre a primeira!</div></div>';return;}
+  el.innerHTML=D.sessions.slice().reverse().map(s=>`<div class="sess-row"><div class="sess-flag">${s.lang==='en'?'🇺🇸':'🇪🇸'}</div><div class="sess-info"><div class="sess-type">${esc(s.type)}</div>${s.note?`<div class="sess-note">${esc(s.note)}</div>`:''}</div><div class="sess-r"><div class="sess-dur ${s.lang}">${fmtMin(s.dur)}</div><div class="sess-date">${s.date}</div></div><button class="sess-del" onclick="delSess(${s.id})">×</button></div>`).join('');
+}
+function delSess(id){D.sessions=D.sessions.filter(s=>s.id!==id);save();renderSessions();updateStats();}
+
+function addNote(){const input=document.getElementById('note-input'),text=input.value.trim();if(!text)return;D.notes.unshift({id:Date.now(),text,date:today()});save();renderNotes();input.value='';}
+function delNote(id){D.notes=D.notes.filter(n=>n.id!==id);save();renderNotes();}
+function renderNotes(){
+  const el=document.getElementById('notes-list');
+  if(!D.notes.length){el.innerHTML='<div class="empty"><div class="empty-icon">✨</div><div class="empty-msg">Nenhuma nota ainda.</div></div>';return;}
+  el.innerHTML=D.notes.map(n=>`<div class="note-item"><div class="note-text">${esc(n.text)}</div><div class="note-meta"><span class="note-date">${n.date}</span><button class="note-del" onclick="delNote(${n.id})">× apagar</button></div></div>`).join('');
+}
+
+const MATS={
+  en:[{icon:'🎓',name:'iTalki',desc:'Professor online. A partir de US$10/aula.',url:'https://www.italki.com'},{icon:'📻',name:'BBC Learning English',desc:'6 Minute English — curtos e claros.',url:'https://www.bbc.co.uk/learningenglish'},{icon:'🃏',name:'Anki',desc:'Flashcards com repetição espaçada.',url:'https://apps.ankiweb.net'},{icon:'📈',name:'HubSpot Academy',desc:'Marketing em inglês. Gratuito.',url:'https://academy.hubspot.com'},{icon:'▶️',name:'Ali Abdaal',desc:'YouTube — produtividade em inglês.',url:'https://youtube.com/@aliabdaal'},{icon:'📺',name:'The Office / Friends',desc:'Séries com legenda em inglês.',url:'https://www.netflix.com'}],
+  es:[{icon:'🦜',name:'Duolingo',desc:'Reforço diário. 15 min para vocabulário.',url:'https://www.duolingo.com'},{icon:'📺',name:'La Casa de Papel',desc:'Legenda em espanhol.',url:'https://www.netflix.com'},{icon:'🎵',name:'Spotify',desc:'Podcasts de negócios em espanhol.',url:'https://www.spotify.com'},{icon:'📺',name:'Club de Cuervos',desc:'Série mexicana — vocabulário de negócios.',url:'https://www.netflix.com'}]
+};
+function renderMaterials(){
+  ['en','es'].forEach(lang=>{
+    document.getElementById('mat-'+lang).innerHTML=MATS[lang].map(m=>`<a href="${m.url}" target="_blank" rel="noopener noreferrer" class="mat-card"><div class="mat-icon">${m.icon}</div><div class="mat-name">${m.name}</div><div class="mat-desc">${m.desc}</div></a>`).join('');
+  });
+}
+
+function setLang(lang,val){D[lang+'Prog']=Number(val);save();updateProgress();updateSidebar();}
+function updateProgress(){
+  const en=D.enProg,es=D.esProg;
+  document.getElementById('en-fill').style.width=en+'%';document.getElementById('es-fill').style.width=es+'%';
+  document.getElementById('en-lbl').textContent=en+'%';document.getElementById('es-lbl').textContent=es+'%';
+  document.getElementById('en-sl').value=en;document.getElementById('es-sl').value=es;
+}
+function updateSidebar(){document.getElementById('sb-en').textContent=D.enProg+'%';document.getElementById('sb-es').textContent=D.esProg+'%';}
+function changeMonth(d){D.month=Math.max(1,Math.min(12,D.month+d));save();document.getElementById('mn1').textContent=D.month;document.getElementById('mn2').textContent=D.month;document.getElementById('d-month').textContent='M'+D.month;}
+
+function updateStats(){
+  const enMin=D.sessions.filter(s=>s.lang==='en').reduce((a,s)=>a+s.dur,0);
+  const esMin=D.sessions.filter(s=>s.lang==='es').reduce((a,s)=>a+s.dur,0);
+  document.getElementById('d-en').textContent=fmtMin(enMin);document.getElementById('d-es').textContent=fmtMin(esMin);
+  const now=new Date(),ws=new Date(now);ws.setDate(now.getDate()-now.getDay());ws.setHours(0,0,0,0);
+  document.getElementById('d-week').textContent=D.sessions.filter(s=>new Date(s.date)>=ws).length;
+  document.getElementById('d-month').textContent='M'+D.month;
+}
+
+(function init(){
+  const now=new Date();
+  const ds=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  document.getElementById('dash-sub').textContent=`${ds[now.getDay()]}, ${now.getDate()} de ${ms[now.getMonth()]} de ${now.getFullYear()}`;
+  renderToday();renderAgenda();renderSkills();renderCheckpoints();
+  renderSessions();renderNotes();renderMaterials();updateProgress();updateSidebar();updateStats();
+  document.getElementById('mn1').textContent=D.month;document.getElementById('mn2').textContent=D.month;
+  document.getElementById('note-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey)addNote();});
+})();
+</script>
+</body>
+</html>
